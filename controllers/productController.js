@@ -5,7 +5,7 @@ import { isAdmin } from "./userController.js";
 export function createProduct(req,res){
     if(!isAdmin(req)){
         res.json({
-            message: "Please login as administrator to create product",
+            message: "Please login as administrator to add product",
           });
           return;
     }
