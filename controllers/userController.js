@@ -6,6 +6,21 @@ dotenv.config();
 
 export function createUser(req, res) {
   const newUserData = req.body;
+
+  if (newUserData.type == "admin") {
+    if (req.user == null) {
+      res.json({
+        message: "Please login as administrator to create admin account",
+      });
+      return;
+    }
+    if (req.user.type != "admin") {
+      res.json({
+        message: "Please login as administrator to create admin account",
+      });
+      return;
+    }
+  }
   newUserData.password = bcrypt.hashSync(newUserData.password, 10);
 
   const user = new User(newUserData);
@@ -63,3 +78,26 @@ export function loginUser(req, res) {
     }
   });
 }
+
+export function isAdmin(req){
+  if(req.user == null){
+    return false;
+  }
+ if(req.user.type !== "admin"){
+  return true;
+ }
+ return true;
+ 
+}
+
+export function isCustomer(req){
+  if(req.user == null){
+    return false;
+  }
+ if(req.user.type !== "customer"){
+  return true;
+ }
+ return true;
+}
+//gs.doe@example.com - customer account
+//gavrawa.doe@example.com - admin account
