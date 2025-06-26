@@ -1,12 +1,13 @@
 import Order from "../models/order.js";
+import Product from "../models/product.js";
 import { isCustomer } from "./userController.js";
 
 
 export async function createOrder(req,res){
    if(!isCustomer){
-    res.json({
-        message: "Please login as customer to create order",
-      });
+    res.status(400).json({ 
+      message: "You are not a customer. Please login as a customer to create an order." 
+    });
     
    }
 
@@ -16,6 +17,7 @@ export async function createOrder(req,res){
       const latestOrder = await Order.find().sort({date : -1}).limit(1);
       
       let orderId 
+
       if(latestOrder.length == 0){
         orderId = "CBC0001";
       }else{
@@ -28,11 +30,23 @@ export async function createOrder(req,res){
       
       }
 
-      const newProductData = req.body;
-      newProductData.orderId = orderId;
-      newProductData.email = req.user.email;
+      const newOrderData = req.body;
 
-      const order = new Order(newProductData);
+      const newProductArray = []
+      
+      for(let i = 0; i< newOrderData.orderedItems.length; i++){
+        
+        const product = await Product .findOne({
+          productId : newOrderData.orderedItems[i].productId
+        })
+        console.log(product);
+      }
+
+      newOrderData.orderId = orderId;
+      newOrderData.email = req.user.email;
+
+      const order = new Order(newOrderData);
+
       await order.save();
       res.json({
         message: "Order created",

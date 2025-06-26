@@ -7,97 +7,124 @@ dotenv.config();
 export function createUser(req, res) {
   const newUserData = req.body;
 
-  if (newUserData.type == "admin") {
-    if (req.user == null) {
-      res.json({
-        message: "Please login as administrator to create admin account",
-      });
-      return;
-    }
-    if (req.user.type != "admin") {
-      res.json({
-        message: "Please login as administrator to create admin account",
-      });
-      return;
+  if (newUserData.type == "admin" ){
+    if(req.user==null){
+        res.json({
+           message:"please login as admin to create admin account"
+        })
+        return
+    }else{
+        if(req.user.type!="admin"){
+            res.json({
+               message:"please login as admin to create admin account"
+            })
+            return
+        }else{
+            console.log("admin")
+        }
     }
   }
+  
   newUserData.password = bcrypt.hashSync(newUserData.password, 10);
 
+
+  console.log(newUserData.password);
+
   const user = new User(newUserData);
-  user
-    .save()
-    .then(() => {
-      res.json({
-        message: "User saved successfully",
-      });
+  user.save().then(() => {
+    res.json({
+      message: "user created successfully"
     })
-    .catch(() => {
-      res.json({
-        message: "Error in saving user",
-      });
-    });
+  }).catch((err) => { 
+    console.error("Error creating user:", err);  
+    res.status(500).json({
+      message: "error in creating user",
+      error: err.message  
+    })
+  })
 }
 
-export function loginUser(req, res) {
-  User.find({ email: req.body.email }).then((users) => {
-    if (users.length == 0) {
-      res.json({
-        message: "User not found",
-      });
-    } else {
-      const user = users[0];
-      const isPasswordCorrect = bcrypt.compareSync(
-        req.body.password,
-        user.password
-      );
+export function loginUser(req,res){
+    User.find({email:req.body.email}).then((users)=>{
+          if(users.length==0){
+           res.json({
+            message:"user not found"
+           })
+          }else{
+            const user=users[0]
+            if (req.body.password && user.password) {
+                const isPasswordCorrect=bcrypt.compareSync(req.body.password,user.password)
+                console.log(isPasswordCorrect)
+                if(isPasswordCorrect){
+                const token=    jwt.sign({
+                    email:user.email,
+                    password:user.password,
+                    firstName:user.firstName,
+                    lastName:user.lastName,
+                     type: user.type,
 
-      if (isPasswordCorrect) {
-        const token = jwt.sign(
-          {
-            email: user.email,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            type: user.type,
-            isBlocked: user.isBlocked,
-            profilePicture: user.profilePicture,
-          },
-          process.env.JWT_SECRET
-        );
+                
+                }, process.env.JWT_SECRET
+)
+                
+                
+                 res.json({
+                        message:"login successfull",
+                        token:token,
+                        user: {  
+                            email:user.email,
+                            firstName:user.firstName,
+                            lastName:user.lastName,
+                            type: user.type,
+                        }
+                    })
+                    
+                }else{
+                    res.json({
+                        message:"invalid password"
+                    })
+                }
+            } else {
+                res.json({
+                    message:"password missing"
+                })
+            }
+          } 
+    })
+}
 
-        res.json({
-          message: "Login successful",
-          token: token,
-        });
-
-        console.log(token);
-      } else {
-        res.json({
-          message: "Incorrect password",
-        });
-      }
-    }
-  });
+export function deleteUser(req,res){
+    User.findOneAndDelete({email:req.body.email}).then((user)=>{
+        if(user){
+            res.json({
+                message:"user deleted"
+            })
+        }else{
+            res.json({
+                message:"user not found"
+            })
+        }
+    })
 }
 
 export function isAdmin(req){
-  if(req.user == null){
-    return false;
-  }
- if(req.user.type !== "admin"){
-  return true;
- }
- return true;
- 
+    if(req.user==null){
+        return false
+    }
+    if(req.user.type!="admin"){
+        return false
+    }else{
+        return true
+    }
 }
 
 export function isCustomer(req){
-  if(req.user == null){
-    return false;
-  }
- if(req.user.type !== "customer"){
-  return true;
- }
- return true;
+  if(req.user==null){
+        return false
+    }
+    if(req.user.type!="customer"){
+        return false
+    }else{
+        return true
+    }
 }
-//gs.doe@example.com - customer account
-//gavrawa.doe@example.com - admin account
