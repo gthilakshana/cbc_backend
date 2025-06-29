@@ -37,7 +37,23 @@ const productSchema = mongoose.Schema({
   description:{
     type: String,
     required: true,
-  }
+  },
+  brands: [
+    {
+      type: String,
+    },
+  ],
+
+  colors: [
+    {
+      type: String,
+    },
+  ],
+  sizes: [
+    {
+      type: String,
+    },
+  ],
 
 
   }
