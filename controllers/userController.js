@@ -128,3 +128,10 @@ export function isCustomer(req){
         return true
     }
 }
+
+
+export function getUsers(req,res){
+    User.find().then((user)=>{
+        res.json(user)
+    })
+}
