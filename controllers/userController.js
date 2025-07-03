@@ -133,6 +133,43 @@ export function deleteUser(req, res) {
 }
 
 
+
+
+export async function updateUser(req, res) {
+    try {
+        const user = await User.findById(req.params.id);
+
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        
+        user.firstName = req.body.firstName || user.firstName;
+        user.lastName = req.body.lastName || user.lastName;
+        user.email = req.body.email || user.email;
+
+      
+        if (typeof req.body.isBlocked !== "undefined") {
+            user.isBlocked = req.body.isBlocked;
+        }
+
+      
+        if (req.body.password && req.body.password.trim() !== "") {
+            user.password = bcrypt.hashSync(req.body.password, 10);
+        }
+
+        await user.save();
+
+        res.json({ message: "User updated successfully" });
+    } catch (err) {
+        console.error("Error updating user:", err);
+        res.status(500).json({ message: "Error updating user", error: err.message });
+    }
+}
+
+
+
+
 export function isAdmin(req){
     if(req.user==null){
         return false
