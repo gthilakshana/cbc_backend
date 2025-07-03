@@ -33,12 +33,14 @@ export function createUser(req, res) {
   const user = new User(newUserData);
   user.save().then(() => {
     res.json({
-      message: "user created successfully"
+      message: "Signup successfully"
+    
+      
     })
   }).catch((err) => { 
     console.error("Error creating user:", err);  
     res.status(500).json({
-      message: "error in creating user",
+     
       error: err.message  
     })
   })
@@ -48,7 +50,7 @@ export function loginUser(req,res){
     User.find({email:req.body.email}).then((users)=>{
           if(users.length==0){
            res.json({
-            message:"user not found"
+            message:"User not found"
            })
           }else{
             const user=users[0]
@@ -69,7 +71,7 @@ export function loginUser(req,res){
                 
                 
                  res.json({
-                        message:"login successfull",
+                        message:"login Success",
                         token:token,
                         user: {  
                             email:user.email,
@@ -81,7 +83,7 @@ export function loginUser(req,res){
                     
                 }else{
                     res.json({
-                        message:"invalid password"
+                        message:""
                     })
                 }
             } else {
@@ -93,19 +95,43 @@ export function loginUser(req,res){
     })
 }
 
-export function deleteUser(req,res){
-    User.findOneAndDelete({email:req.body.email}).then((user)=>{
-        if(user){
+// export function deleteUser(req,res){
+//     User.findOneAndDelete({email:req.body.email}).then((user)=>{
+//         if(user){
+//             res.json({
+//                 message:"user deleted"
+//             })
+//         }else{
+//             res.json({
+//                 message:"user not found"
+//             })
+//         }
+//     })
+// }
+
+
+export function deleteUser(req, res) {
+    const email = req.params.email;
+
+    User.findOneAndDelete({ email }).then((user) => {
+        if (user) {
             res.json({
-                message:"user deleted"
-            })
-        }else{
-            res.json({
-                message:"user not found"
-            })
+                message: "user deleted"
+            });
+        } else {
+            res.status(404).json({
+                message: "user not found"
+            });
         }
-    })
+    }).catch((err) => {
+        console.error("Error deleting user:", err);
+        res.status(500).json({
+            message: "error deleting user",
+            error: err.message
+        });
+    });
 }
+
 
 export function isAdmin(req){
     if(req.user==null){
