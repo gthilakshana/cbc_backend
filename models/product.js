@@ -34,7 +34,14 @@ const productSchema = mongoose.Schema({
     type: Number,
     required: true,
   },
+
+
   description:{
+    type: String,
+    required: true,
+  },
+
+  delivery: {
     type: String,
     required: true,
   },
@@ -54,6 +61,12 @@ const productSchema = mongoose.Schema({
       type: String,
     },
   ],
+
+  materials: [
+    {
+      type: String,
+    },
+  ]
 
 
   }

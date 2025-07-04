@@ -74,6 +74,10 @@ export function updateProduct(req,res){
   })
 }
 
+
+
+
+
 export async function getProductById(req, res) {
 
   try {
