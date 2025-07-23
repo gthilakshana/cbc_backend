@@ -36,7 +36,7 @@ const orderSchema = mongoose.Schema({
    },
    paymentId:{
     type: String,
-    required: true
+    
    },
    status:{
     type: String,
@@ -60,5 +60,5 @@ const orderSchema = mongoose.Schema({
    }
 })
 
-const Order = mongoose.model("Orders", orderSchema);
+const Order = mongoose.model("orders", orderSchema);
 export default Order;
